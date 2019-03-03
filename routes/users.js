@@ -1,13 +1,21 @@
-var express = require('express');
+var express    = require('express');
 var router = express.Router();
+var app        = express();
+var bodyParser = require('body-parser');
+var sqlite3    = require('sqlite3');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-router.get('/cool', function(req, res, next) {
-  res.send('You are so cool');
+router.get('/', function(req, res) {
+  var db = new sqlite3.Database('sample');
+  db.serialize(function() {
+    db.all('SELECT id,name FROM USER', function(err, rows) {
+      // res.json(rows);
+      res.send(rows);
+    });
+  });
+  db.close();
 });
 
 module.exports = router;
